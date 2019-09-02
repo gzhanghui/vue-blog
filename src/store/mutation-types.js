@@ -1,0 +1,5 @@
+export const SET_HOT_COMMENT = 'SET_HOT_COMMENT'
+
+export const SET_LONGIN_STATE = 'SET_LONGIN_STATE'
+
+export const SET_LONGIN_MODEL = 'SET_LONGIN_MODEL'
