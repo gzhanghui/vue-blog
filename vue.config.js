@@ -1,13 +1,11 @@
 const path = require('path');
-const axios = require('axios');
 const bodyParser = require('body-parser')
 const cheerio = require('cheerio');
 const request = require('request');
 const fs = require('fs');
-// const qs = require('qs')
-// const querystring = require('querystring');
-var moment = require('moment');
-moment.locale('zh-cn')
+
+const moment = require('moment');
+moment.locale('zh-cn');
 
 function resolve(dir) {
     return path.join(__dirname, dir)
@@ -22,8 +20,24 @@ module.exports = {
     },
     devServer: {
 
-        before: function(app) {
-            app.post('/api/comments', bodyParser.json(), async(req, res) => {
+        before: function (app) {
+            /*登录状态*/
+            app.get('/api/loginStatus', async (req, res) => {
+                try {
+                    const cookies = await readCookies('cookies');
+                    const loginInfo = await getLoginStatus(cookies);
+                    res.json({
+                        code: 0,
+                        data: loginInfo,
+                        msg: 'success'
+                    })
+                } catch (err) {
+                    console.log(err);
+                }
+            });
+
+            /*提交评论*/
+            app.post('/api/comments', bodyParser.json(), async (req, res) => {
                 try {
                     console.log(req.body)
                     let j = request.jar();
@@ -32,13 +46,13 @@ module.exports = {
                         'accept': 'application/json',
                         'content-type': 'application/json;charset=UTF-8',
                         'origin': 'https: //www.jianshu.com',
-                        'referer': 'https://www.jianshu.com/p/30c3 c3d3a09a',
+                        'referer': 'https://www.jianshu.com/p/30c3c3d3a09a',
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
                         cookie: cookies
-                    }
+                    };
 
                     const url = 'https://www.jianshu.com/notes/46280711/comments';
-                    request.post({ url: url, jar: j, form: req.body, headers: headers }, (error, reponse, data) => {
+                    request.post({url: url, jar: j, form: req.body, headers: headers}, (error, response, data) => {
                         res.json({
                             code: 0,
                             data: data,
@@ -49,35 +63,32 @@ module.exports = {
                 } catch (err) {
                     console.log(err);
                 }
-
             });
-            app.get('/api/noteList', function(req, res) {
+            /*获取文章列表*/
+            app.get('/api/noteList', (req, res) => {
                 const params = req.query;
                 const url = `https://www.jianshu.com/u/${params.author}?order_by=${params.order_by}&page=${params.page}`;
-                axios.get(url, {
+                request.get({
+                    url: url,
                     headers: {
                         referer: 'https://www.jianshu.com',
                         host: 'www.jianshu.com'
                     },
-                }).then((response) => {
-                    const content = notelist(response.data)
+                },(error,response,data)=>{
+                    const content = noteList(data);
                     res.json({
                         data: content,
                         msg: 'success',
                         code: 0
                     })
-                }).catch((e) => {
-                    console.log(e)
                 })
             });
-
-
-
-            app.get('/api/article', function(req, res) {
+            /*获取文章内容*/
+            app.get('/api/article', (req, res) => {
                 const url = 'https://www.jianshu.com/p/' + req.query.id;
-                request.get({ url: url }, (error, reponse, body) => {
+                request.get({url: url}, (error, response, body) => {
                     const $ = cheerio.load(body);
-                    $('img').each(function() {
+                    $('img').each(function () {
                         const src = $(this).attr('data-original-src')
                         $(this).attr('src', 'https:' + src)
                     });
@@ -91,40 +102,32 @@ module.exports = {
                     res.json(data)
                 })
             });
-
-
-
-
-
-
-            app.get('/api/captchas', function(req, res) {
-                const url = `https://www.jianshu.com/captchas/new?t=${ req.query.t}`;
-                axios.get(url, {
+            /*获取验证信息，用于登录验证码验证*/
+            app.get('/api/captchas', (req, res) => {
+                const url = `https://www.jianshu.com/captchas/new?t=${req.query.t}`;
+                request.get({
+                    url: url,
                     headers: {
                         referer: 'https://www.jianshu.com',
                         host: 'www.jianshu.com'
                     }
-                }).then((response) => {
-                    const ret = response.data;
-                    const data = {
-                        data: ret,
+                }, (error, response, data) => {
+                    res.json({
+                        data: data,
                         msg: 'success',
                         code: 0
-                    };
-                    res.json(data)
-                }).catch((e) => {
-                    console.log(e)
+                    })
                 })
             });
-
+            /* 登录 */
             app.use(bodyParser.json()); //数据JSON类型
-            app.use(bodyParser.urlencoded({ extended: false }));
-            app.post('/api/login', function(req, res) {
+            app.use(bodyParser.urlencoded({extended: false}));
+            app.post('/api/login', function (req, res) {
                 let j = request.jar();
-                request.get({ url: 'https://www.jianshu.com/sign_in', jar: j }, function(error, reponse, body) {
+                request.get({url: 'https://www.jianshu.com/sign_in', jar: j}, (error, response, body) => {
                     const cookies = j.getCookieString('https://www.jianshu.com/sign_in');
                     const $ = cheerio.load(body);
-                    req.body['authenticity_token'] = $('input[name="authenticity_token"]').val()
+                    req.body['authenticity_token'] = $('input[name="authenticity_token"]').val();
                     const headers = {
                         referer: 'https://www.jianshu.com/sign_in',
                         'content-type': 'application/x-www-form-urlencoded',
@@ -132,39 +135,32 @@ module.exports = {
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
                         host: 'www.jianshu.com',
                         cookie: cookies
-                    }
+                    };
                     const url = 'https://www.jianshu.com/sessions';
-                    request.post({ url: url, jar: j, form: req.body, headers: headers }, function() {
+                    request.post({url: url, jar: j, form: req.body, headers: headers}, async () => {
                         const cookie = j.getCookieString(url);
-                        request.get({
-                            url: 'https://www.jianshu.com/sign_in',
-                            headers: { cookie: cookie }
-                        }, (error, reponse, data) => {
-                            const $ = cheerio.load(data)
-                            let info = $('script[data-name="page-data"]').html()
-                            const authenticity_token = $('meta[name="csrf-token"]').attr('content')
-                            if (info) {
-                                info = JSON.parse(info)
-                                info.authenticity_token = authenticity_token
-                            }
+                        try {
+                            const cookie = j.getCookieString(url);
+                            const loginInfo = await getLoginStatus(cookie);
                             res.json({
                                 code: 0,
-                                data: info,
+                                data: loginInfo,
                                 msg: 'success'
                             })
-
-                        })
-                        fs.writeFile(__dirname + '/cookies.txt', cookie, () => {});
+                        } catch (err) {
+                            console.log(err);
+                        }
+                        fs.writeFile(__dirname + '/cookies.txt', cookie, () => {
+                        });
                     })
                 })
             });
 
-
-            app.post('/api/sign_out', async(req, res) => {
+            /*退出*/
+            app.post('/api/signOut', async (req, res) => {
                 try {
                     let j = request.jar();
                     const cookies = await readCookies('cookies');
-
                     const headers = {
                         referer: 'https://www.jianshu.com/',
                         'content-type': 'application/x-www-form-urlencoded',
@@ -172,30 +168,21 @@ module.exports = {
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
                         host: 'www.jianshu.com',
                         cookie: cookies
-                    }
+                    };
                     const url = 'https://www.jianshu.com/sign_out';
-                    request.post({ url: url, jar: j, form: req.body, headers: headers }, function() {
-                        const cookie = j.getCookieString(url);
-                        request.get({
-                            url: 'https://www.jianshu.com',
-                            headers: { cookie: cookie }
-                        }, (error, reponse, data) => {
-                            const $ = cheerio.load(data)
-                            let info = $('script[data-name="page-data"]').html()
-                            const authenticity_token = $('meta[name="csrf-token"]').attr('content')
-                            if (info) {
-                                info = JSON.parse(info)
-                                info.authenticity_token = authenticity_token
-                            }
+                    request.post({url: url, jar: j, form: req.body, headers: headers}, async () => {
+                        try {
+                            const cookie = j.getCookieString(url);
+                            const loginInfo = await getLoginStatus(cookie);
                             res.json({
                                 code: 0,
-                                data: info,
+                                data: loginInfo,
                                 msg: 'success'
                             })
-
-                        })
+                        } catch (err) {
+                            console.log(err);
+                        }
                     })
-
                 } catch (err) {
                     console.log(err);
                 }
@@ -206,12 +193,12 @@ module.exports = {
     publicPath: ''
 };
 
-
-function notelist(res) {
+/*解析文章列表*/
+function noteList(res) {
     let $ = cheerio.load(res);
-    let notelistData = [];
-    let notelist = $('.note-list li');
-    notelist.each(function() {
+    let noteListData = [];
+    let noteList = $('.note-list li');
+    noteList.each(function () {
         const o = {};
         let _this = $(this);
         const time = _this.find('.meta .time').attr('data-shared-at')
@@ -223,11 +210,12 @@ function notelist(res) {
         o['comments'] = _this.find('.meta a').eq(1).text();
         o['like'] = _this.find('.meta .ic-list-like').parent().text();
         o['time'] = formatDate(time);
-        notelistData.push(o)
+        noteListData.push(o)
     });
-    return notelistData
+    return noteListData
 }
 
+/*格式化时间*/
 function formatDate(time) {
     const delta = moment.duration(new Date() * 1).as('days') - moment.duration(new Date(time) * 1).as('days');
     if (delta > 3) {
@@ -238,25 +226,29 @@ function formatDate(time) {
     return time
 }
 
-function getCookies(finnalLoginUrl, name) {
-    return new Promise((resolve, reject) => {
-        let j = request.jar();
-        request.get({ url: finnalLoginUrl, jar: j }, function(error, reponse, body) {
-            let cookies = j.getCookieString(finnalLoginUrl);
-            fs.writeFile(__dirname + '/' + name + '.txt', cookies, (error) => {
-                if (error) {
-                    reject(0);
-                } else {
-                    resolve(cookies);
-                }
-            });
+/*登录状态*/
+function getLoginStatus(cookies) {
+    return new Promise((resolve) => {
+        request.get({
+            url: 'https://www.jianshu.com',
+            headers: {cookie: cookies}
+        }, (error, response, data) => {
+            const $ = cheerio.load(data);
+            let info = $('script[data-name="page-data"]').html();
+            const authenticity_token = $('meta[name="csrf-token"]').attr('content')
+            if (info) {
+                info = JSON.parse(info);
+                info.authenticity_token = authenticity_token
+            }
+            resolve(info)
         })
     })
 }
 
+/*读取cookie*/
 function readCookies(name) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(__dirname + '/' + name + '.txt', 'utf-8', function(err, data) {
+    return new Promise((resolve) => {
+        fs.readFile(__dirname + '/' + name + '.txt', 'utf-8', function (err, data) {
             if (err) {
                 console.error(err);
             } else {

@@ -1,8 +1,14 @@
 <template>
-  <div class="aritcle-wrapper container" style="margin-bottom:200px">
+  <div class="article-wrapper container" style="margin-bottom:200px">
         <div v-html="articleHtml" ref="content" class="content "></div>
        <comment/>
+    <div class="comment-wrap">
+      <div class="comment-title">
 
+        <h3>全部评论(21)</h3>
+      </div>
+      <CommentList/>
+    </div>
   </div>
 </template>
 
@@ -22,6 +28,7 @@ hljs.registerLanguage("xml", html); */
 
 import { getArticle } from "api/api";
 import Comment from "components/comment.vue";
+import CommentList from "components/comment-list.vue"
 export default {
   data() {
     return {
@@ -29,10 +36,11 @@ export default {
     };
   },
   mounted() {
-    this._getArticle();
+    // this._getArticle();
   },
   components:{
-    Comment
+    Comment,
+    CommentList
   },
   methods: {
     _getArticle() {
@@ -53,7 +61,7 @@ export default {
 <style   lang="stylus">
 /*  */
 @import '~highlight.js/styles/atom-one-dark.css';
-.aritcle-wrapper {
+.article-wrapper {
   padding-top 56px
   .note .post {
     margin: 0 auto;
@@ -61,6 +69,17 @@ export default {
     padding-bottom: 40px;
     width: 620px;
   }
+  .comment-title
+  {
+    background #F2F6FC
+    h3{
+      font-size 16px
+      font-weight 600
+      padding: 10px 20px;
+    }
+  }
+  
+  
 
   .content .title {
     word-break: break-word !important;

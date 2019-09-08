@@ -32,7 +32,7 @@ export default {
       const data = this.comment;
       return {
         src:
-          "https://webfs.yun.kugou.com/201908291543/4cdcc03aaa87a9af9b964239df0f566f/G153/M04/13/14/OYcBAFz3fF6AbF0fADS_2OPt0ag626.mp3",
+          "https://webfs.yun.kugou.com/201909070150/62c3d414aaea1e50734a9c29fc62ab4e/G153/M04/13/14/OYcBAFz3fF6AbF0fADS_2OPt0ag626.mp3",
         title: data.title,
         artist: data.author,
         pic: data.images,

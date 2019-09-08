@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <nav-bar></nav-bar>
+    <nav-bar @sign-in="signIn" @sign-out="signOut"></nav-bar>
     <share :show="transition.share"></share>
     <player :show="transition.cd"></player>
     <div class="view">
@@ -11,9 +11,8 @@
       </transition>
     </div>
     <el-backtop target=".view"></el-backtop>
-    <div id="captcha" ref="captcha" style="display:noqne"></div>
-
-    <login />
+    <div id="captcha" ref="captcha" style="display:no"></div>
+    <login ref="loginCom" />
   </div>
 </template>
 <script>
@@ -37,7 +36,15 @@ export default {
     };
   },
   mounted() {},
-  methods: {},
+  methods: {
+      signIn(){
+          this.$refs.loginCom._captchas();
+          this.$refs.loginCom.showModel()
+      },
+      signOut(){
+          this.$refs.loginCom._sign_out()
+      }
+  },
   watch: {
     $route(to, from) {
       console.log(to.name);

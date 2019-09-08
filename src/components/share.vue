@@ -3,13 +3,13 @@
     <div class="share" v-show="show">
       <ul>
         <li class="share-item share-item-3">
-          <i class="icon icon-github-fill"></i>
+          <i class="iconfont icon-github-fill"></i>
         </li>
         <li class="share-item share-item-2">
-          <i class="icon icon-QQ-circle-fill"></i>
+          <i class="iconfont icon-QQ-circle-fill"></i>
         </li>
         <li class="share-item share-item-1">
-          <i class="icon icon-weibo-circle-fill"></i>
+          <i class="iconfont icon-weibo-circle-fill"></i>
         </li>
       </ul>
     </div>
@@ -66,7 +66,7 @@ export default {
       }
     }
 
-    .icon {
+    .iconfont {
       font-size: 32px;
       line-height: 70px;
       color: $color-text-d;

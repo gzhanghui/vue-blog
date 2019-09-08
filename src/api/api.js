@@ -10,7 +10,7 @@ export function getNoteList(page, order_by, author) {
         page: page || 1,
         order_by: order_by || 'shared_at',
         author: author || '2c3d4f7ba0d4'
-    }
+    };
 
     return axios.get(url, {
         params: params
@@ -26,7 +26,7 @@ export function getArticle(id) {
     const url = '/api/article';
     const params = {
         id: id
-    }
+    };
     return axios.get(url, {
         params: params
     }).then((res) => {
@@ -40,7 +40,7 @@ export function captchas() {
     const url = `/api/captchas`;
     const params = {
         t: `${Date.now()}-${Math.random().toString(36).substring(3, 6)}`
-    }
+    };
     return axios.get(url, {
         params: params
     }).then((res) => {
@@ -63,7 +63,7 @@ export function login(captcha) {
         'captcha[validation][seccode]': captcha.geetest_seccode,
         'session[remember_me]': true
     }
-    console.log(data)
+
     const url = '/api/login';
     return axios.post(url, qs.stringify(data)).then((res) => {
         return Promise.resolve(res.data)
@@ -80,7 +80,7 @@ export function sign_out(authenticity_token) {
         '_method': 'delete',
         'authenticity_token': authenticity_token
     }
-    const url = '/api/sign_out';
+    const url = '/api/signOut';
     return axios.post(url, qs.stringify(data)).then((res) => {
         return Promise.resolve(res.data)
     }).catch((error) => {
@@ -91,6 +91,16 @@ export function sign_out(authenticity_token) {
 export function comments(content) {
     const url = '/api/comments';
     return axios.post(url, content).then((res) => {
+        return Promise.resolve(res.data)
+    }).catch((error) => {
+        console.log(error);
+    })
+}
+
+
+export function loginStatus(){
+    const url ='/api/loginStatus';
+    return axios.get(url).then((res) => {
         return Promise.resolve(res.data)
     }).catch((error) => {
         console.log(error);

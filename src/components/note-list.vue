@@ -4,7 +4,7 @@
           <ul class="note-list" v-if="noteList.length>0">
             <li :data-note-id="item.noteId" v-for="item in noteList" :key="item.noteId">
               <div class="line">
-                <i class="icon icon-line"></i>
+                <i class="iconfont icon-line"></i>
               </div>
               <div class="content">
                 <h2 class="title" @click="goArticle(item.articleId)">{{item.title}}</h2>
@@ -12,19 +12,19 @@
                 <div class="meta">
                   <a class="read-btn" @click="goArticle(item.articleId)" href="javascript:;">阅读全文</a>
                   <span>
-                    <i class="icon icon-eye1"></i>
+                    <i class="iconfont icon-eye1"></i>
                     <b>{{item.read}}</b>
                   </span>
                   <span>
-                    <i class="icon icon-message"></i>
+                    <i class="iconfont icon-message"></i>
                     <b>{{item.comments}}</b>
                   </span>
                   <span>
-                    <i class="icon icon-like"></i>
+                    <i class="iconfont icon-like"></i>
                     <b>{{item.like}}</b>
                   </span>
                   <span class="time">
-                    <i class="icon-time-circle icon"></i>
+                    <i class="icon-time-circle iconfont"></i>
                     <b>{{item.time}}</b>
                   </span>
                 </div>
@@ -77,7 +77,7 @@ export default {
       font-size: $font-size-medium;
 
       .line {
-        .icon {
+        .iconfont {
           color: $color-theme;
           font-size: 27px;
         }
@@ -105,7 +105,7 @@ export default {
         padding-top: 15px;
         font-size: $font-size-small;
 
-        .icon {
+        .iconfont {
           font-size: 13px;
         }
 

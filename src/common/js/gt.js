@@ -1,6 +1,7 @@
 "v0.4.8 Geetest Inc.";
 
-(function(window) {
+(function (window) {
+    "use strict";
     if (typeof window === 'undefined') {
         throw new Error('Geetest requires browser environment');
     }
@@ -14,7 +15,7 @@
     }
 
     _Object.prototype = {
-        _each: function(process) {
+        _each: function (process) {
             var _obj = this._obj;
             for (var k in _obj) {
                 if (_obj.hasOwnProperty(k)) {
@@ -27,7 +28,7 @@
 
     function Config(config) {
         var self = this;
-        new _Object(config)._each(function(key, value) {
+        new _Object(config)._each(function (key, value) {
             self[key] = value;
         });
     }
@@ -45,10 +46,10 @@
             fullpage: {
                 static_servers: ["static.geetest.com", "dn-staticdown.qbox.me"],
                 type: 'fullpage',
-                fullpage: '/static/js/slide.0.0.0.js'
+                fullpage: '/static/js/fullpage.0.0.0.js'
             }
         },
-        _get_fallback_config: function() {
+        _get_fallback_config: function () {
             var self = this;
             if (isString(self.type)) {
                 return self.fallback_config[self.type];
@@ -58,26 +59,26 @@
                 return self.fallback_config.slide;
             }
         },
-        _extend: function(obj) {
+        _extend: function (obj) {
             var self = this;
-            new _Object(obj)._each(function(key, value) {
+            new _Object(obj)._each(function (key, value) {
                 self[key] = value;
             })
         }
     };
-    var isNumber = function(value) {
+    var isNumber = function (value) {
         return (typeof value === 'number');
     };
-    var isString = function(value) {
+    var isString = function (value) {
         return (typeof value === 'string');
     };
-    var isBoolean = function(value) {
+    var isBoolean = function (value) {
         return (typeof value === 'boolean');
     };
-    var isObject = function(value) {
+    var isObject = function (value) {
         return (typeof value === 'object' && value !== null);
     };
-    var isFunction = function(value) {
+    var isFunction = function (value) {
         return (typeof value === 'function');
     };
     var MOBILE = /Mobi/i.test(navigator.userAgent);
@@ -86,7 +87,7 @@
     var callbacks = {};
     var status = {};
 
-    var nowDate = function() {
+    var nowDate = function () {
         var date = new Date();
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
@@ -114,32 +115,32 @@
         return currentdate;
     }
 
-    var random = function() {
+    var random = function () {
         return parseInt(Math.random() * 10000) + (new Date()).valueOf();
     };
 
-    var loadScript = function(url, cb) {
+    var loadScript = function (url, cb) {
         var script = document.createElement("script");
         script.charset = "UTF-8";
         script.async = true;
 
         // 瀵筭eetest鐨勯潤鎬佽祫婧愭坊鍔� crossOrigin
-        if (/static\.geetest\.com/g.test(url)) {
+        if ( /static\.geetest\.com/g.test(url)) {
             script.crossOrigin = "anonymous";
         }
 
-        script.onerror = function() {
+        script.onerror = function () {
             cb(true);
         };
         var loaded = false;
-        script.onload = script.onreadystatechange = function() {
+        script.onload = script.onreadystatechange = function () {
             if (!loaded &&
                 (!script.readyState ||
                     "loaded" === script.readyState ||
                     "complete" === script.readyState)) {
 
                 loaded = true;
-                setTimeout(function() {
+                setTimeout(function () {
                     cb(false);
                 }, 0);
             }
@@ -148,24 +149,24 @@
         head.appendChild(script);
     };
 
-    var normalizeDomain = function(domain) {
+    var normalizeDomain = function (domain) {
         // special domain: uems.sysu.edu.cn/jwxt/geetest/
         // return domain.replace(/^https?:\/\/|\/.*$/g, ''); uems.sysu.edu.cn
         return domain.replace(/^https?:\/\/|\/$/g, ''); // uems.sysu.edu.cn/jwxt/geetest
     };
-    var normalizePath = function(path) {
+    var normalizePath = function (path) {
         path = path.replace(/\/+/g, '/');
         if (path.indexOf('/') !== 0) {
             path = '/' + path;
         }
         return path;
     };
-    var normalizeQuery = function(query) {
+    var normalizeQuery = function (query) {
         if (!query) {
             return '';
         }
         var q = '?';
-        new _Object(query)._each(function(key, value) {
+        new _Object(query)._each(function (key, value) {
             if (isString(value) || isNumber(value) || isBoolean(value)) {
                 q = q + encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
             }
@@ -175,7 +176,7 @@
         }
         return q.replace(/&$/, '');
     };
-    var makeURL = function(protocol, domain, path, query) {
+    var makeURL = function (protocol, domain, path, query) {
         domain = normalizeDomain(domain);
 
         var url = normalizePath(path) + normalizeQuery(query);
@@ -186,11 +187,11 @@
         return url;
     };
 
-    var load = function(config, send, protocol, domains, path, query, cb) {
-        var tryRequest = function(at) {
+    var load = function (config, send, protocol, domains, path, query, cb) {
+        var tryRequest = function (at) {
 
             var url = makeURL(protocol, domains[at], path, query);
-            loadScript(url, function(err) {
+            loadScript(url, function (err) {
                 if (err) {
                     if (at >= domains.length - 1) {
                         cb(true);
@@ -212,7 +213,7 @@
     };
 
 
-    var jsonp = function(domains, path, config, callback) {
+    var jsonp = function (domains, path, config, callback) {
         if (isObject(config.getLib)) {
             config._extend(config.getLib);
             callback(config);
@@ -224,7 +225,7 @@
         }
 
         var cb = "geetest_" + random();
-        window[cb] = function(data) {
+        window[cb] = function (data) {
             if (data.status == 'success') {
                 callback(data.data);
             } else if (!data.status) {
@@ -235,19 +236,20 @@
             window[cb] = undefined;
             try {
                 delete window[cb];
-            } catch (e) {}
+            } catch (e) {
+            }
         };
         load(config, true, config.protocol, domains, path, {
             gt: config.gt,
             callback: cb
-        }, function(err) {
+        }, function (err) {
             if (err) {
                 callback(config._get_fallback_config());
             }
         });
     };
 
-    var reportError = function(config, url) {
+    var reportError = function (config, url) {
         load(config, false, config.protocol, ['monitor.geetest.com'], '/monitor/send', {
             time: nowDate(),
             captcha_id: config.gt,
@@ -255,10 +257,10 @@
             pt: pt,
             exception_url: url,
             error_code: config.error_code
-        }, function(err) {})
+        }, function (err) {})
     }
 
-    var throwError = function(errorType, config) {
+    var throwError = function (errorType, config) {
         var errors = {
             networkError: '缃戠粶閿欒',
             gtTypeError: 'gt瀛楁涓嶆槸瀛楃涓茬被鍨�'
@@ -270,7 +272,7 @@
         }
     };
 
-    var detect = function() {
+    var detect = function () {
         return window.Geetest || document.getElementById("gt_lib");
     };
 
@@ -278,7 +280,7 @@
         status.slide = "loaded";
     }
 
-    window.initGeetest = function(userConfig, callback) {
+    window.initGeetest = function (userConfig, callback) {
 
         var config = new Config(userConfig);
 
@@ -295,26 +297,21 @@
             config.api_server = 'yumchina.geetest.com';
         }
 
-        if (userConfig.gt) {
+        if(userConfig.gt){
             window.GeeGT = userConfig.gt
         }
 
-        if (userConfig.challenge) {
+        if(userConfig.challenge){
             window.GeeChallenge = userConfig.challenge
         }
 
         if (isObject(userConfig.getType)) {
             config._extend(userConfig.getType);
         }
-        jsonp([config.api_server || config.apiserver], config.typePath, config, function(newConfig) {
+        jsonp([config.api_server || config.apiserver], config.typePath, config, function (newConfig) {
             var type = newConfig.type;
-            
-            var init = function() {
+            var init = function () {
                 config._extend(newConfig);
-                config.fullpage= "/static/js/click.2.8.5.js"
-                
-                // fullpage: "/static/js/fullpage.8.8.4.js"
-
                 callback(new window.Geetest(config));
             };
 
@@ -325,7 +322,7 @@
 
                 callbacks[type].push(init);
 
-                load(config, true, config.protocol, newConfig.static_servers || newConfig.domains, newConfig[type] || newConfig.path, null, function(err) {
+                load(config, true, config.protocol, newConfig.static_servers || newConfig.domains, newConfig[type] || newConfig.path, null, function (err) {
                     if (err) {
                         status[type] = 'fail';
                         throwError('networkError', config);

@@ -12,17 +12,33 @@
           style="border-radius:0"
           placeholder="请输入内容"
         ></el-input>
-        <div class="emoji">
-          <el-button type="text">
-            <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
-              <path
-                d="M7.523 13.5h8.954c-.228 2.47-2.145 4-4.477 4-2.332 0-4.25-1.53-4.477-4zM12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm0-1.5a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15zm-3-8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"
-              />
-            </svg>
-          </el-button>
-        </div>
+        <el-popover
+          placement="bottom-end"
+          width="366"
+          trigger="click">
+          <div class="emoji-panel">
+            <ul class="indicator">
+              <li v-for="(count,index) in emojiTabCount" :key="count"
+                  class="indicator-item" :class="{active:index===tabActive}"
+                  @click="switchTab(index)"></li>
+            </ul>
+            <div class="emoji-container">
+              <ul>
+                <li v-for="(item,index) in emojiList"
+                    :key="index"
+                    @click="select"
+                    v-show="index===tabActive">
+                  <span :key="code.code" v-for="(code,i) in item" :data-index="i">{{code.text}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="emoji" slot="reference">
+            <i class="iconfont icon-emoji1"></i>
+          </div>
+        </el-popover>
       </div>
-      <transition name="el-zoom-in-center">
+      <transition name="slide" mode="out-in">
         <div class="send" v-show="showSend">
           <el-button type="primary" @click="send">发送</el-button>
         </div>
@@ -32,45 +48,143 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { comments } from "api/api";
-export default {
-  data() {
-    return {
-      showSend: false,
-      content: {
-        content: "这是一个测试"
-      }
-    };
-  },
-  methods: {
-    inputFocus() {
+  import {comments} from "api/api";
+  import {emoji} from 'common/emoji/emoji'
+
+  export default {
+    data() {
+      return {
+        showSend: false,
+        content: {
+          content: "这是一个测试"
+        },
+        emojiTabCount: 4,
+        tabActive: 0
+      };
+    },
+    mounted() {
       // this.showSend = true
     },
-    send() {
-      comments(this.content).then(res => {
-        console.log(res);
-      });
-    }
-  },
-
-  components: {}
-};
+    computed: {
+      emojiList() {
+        const arr = [];
+        const count = emoji.length / this.emojiTabCount;
+        for (let i = 0; i < this.emojiTabCount; i++) {
+          const _arr = emoji.slice(count * i, count * (i + 1));
+          arr.push(_arr)
+        }
+        return arr
+      }
+    },
+    methods: {
+      select(e) {
+        if (e.target.nodeName.toLowerCase() === 'span') {
+          parseInt(e.target.dataset.index);
+          const val = this.content.content;
+          this.content.content = val + e.target.innerText
+        }
+      },
+      switchTab(index) {
+        this.tabActive = index
+      },
+      send() {
+        comments(this.content).then(res => {
+          console.log(res);
+        });
+      }
+    },
+    components: {}
+  };
 </script>
 
 <style scoped lang="stylus">
-.comment-block {
-  display: flex;
-}
-
-.textarea {
-  position: relative;
-  flex: 1;
-  margin-right: 28px;
-
-  .emoji {
-    position: absolute;
-    right: 10px;
-    bottom: -8px;
+  @import '~common/styles/variable.styl';
+  .comment-block {
+    display: flex;
   }
-}
+
+  .emoji-panel {
+    padding 10px
+
+    .indicator {
+      padding 10px 0
+      display flex
+      align-items: center;
+      justify-content: center;
+
+      .indicator-item {
+        width: 8px;
+        height: 8px;
+        background-color: #8c8c8c;
+        margin: 0 5px;
+        border-radius: 50%;
+        cursor: pointer;
+
+        &.active {
+          background-color $color-sub-theme
+        }
+      }
+
+    }
+
+    .emoji-container {
+      margin-top 10px
+
+      span {
+        user-select none
+        transition background-color .3s
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: #404040;
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        overflow: hidden;
+
+        &:hover {
+          background-color rgba(0, 0, 0, .075)
+        }
+      }
+    }
+  }
+
+  .slide-enter-active, .slide-leave-active {
+    transition: all 0.3s;
+  }
+
+  .slide-enter, .slide-leave-to {
+    transform: scale(0);
+  }
+
+  .width-enter-active, .width-leave-active {
+    transition: all 0.3s;
+  }
+
+  .textarea {
+    position: relative;
+    flex: 1;
+    margin-right: 28px;
+    font-family Microsoft YaHei
+    transition: all 0.3s;
+
+    .emoji {
+      position: absolute;
+      right: 10px;
+      bottom: 6px;
+
+      .iconfont {
+        user-select none
+        font-size 20px
+        cursor pointer
+
+        &:hover {
+          color #0ab70e
+        }
+      }
+    }
+  }
 </style>
