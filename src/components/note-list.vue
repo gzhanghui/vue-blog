@@ -1,39 +1,43 @@
 <template>
   <div class="list-wrapper ">
+    <el-scrollbar class="scroll">
         <div class="list-container container">
-          <ul class="note-list" v-if="noteList.length>0">
-            <li :data-note-id="item.noteId" v-for="item in noteList" :key="item.noteId">
-              <div class="line">
-                <i class="iconfont icon-line"></i>
-              </div>
-              <div class="content">
-                <h2 class="title" @click="goArticle(item.articleId)">{{item.title}}</h2>
-                <p class="abstract">{{item.abstract}}</p>
-                <div class="meta">
-                  <a class="read-btn" @click="goArticle(item.articleId)" href="javascript:;">阅读全文</a>
-                  <span>
+          <div class="row">
+           <div class="col-md-8 ">
+             <ul class="note-list" v-if="noteList.length>0">
+               <li :data-note-id="item.noteId" v-for="item in noteList" :key="item.noteId">
+                 <div class="line">
+                   <i class="iconfont icon-line"></i>
+                 </div>
+                 <div class="content">
+                   <h2 class="title" @click="goArticle(item.articleId,item.noteId)">{{item.title}}</h2>
+                   <p class="abstract">{{item.abstract}}</p>
+                   <div class="meta">
+                     <a class="read-btn" @click="goArticle(item.articleId,item.noteId)" href="javascript:;">阅读全文</a>
+                     <span>
                     <i class="iconfont icon-eye1"></i>
                     <b>{{item.read}}</b>
                   </span>
-                  <span>
+                     <span>
                     <i class="iconfont icon-message"></i>
                     <b>{{item.comments}}</b>
                   </span>
-                  <span>
+                     <span>
                     <i class="iconfont icon-like"></i>
                     <b>{{item.like}}</b>
                   </span>
-                  <span class="time">
+                     <span class="time">
                     <i class="icon-time-circle iconfont"></i>
                     <b>{{item.time}}</b>
                   </span>
-                </div>
-              </div>
-            </li>
-          </ul>
+                   </div>
+                 </div>
+               </li>
+             </ul>
+           </div>
+          </div>
         </div>
-      
-    
+    </el-scrollbar>
   </div>
 </template>
 
@@ -55,8 +59,8 @@ export default {
         console.log(res);
       });
     },
-    goArticle(id) {
-      this.$router.push({ name: "article", query: { id: id } });
+    goArticle(id,noteId) {
+      this.$router.push({ name: "article", query: { id: id,noteId:'46280711' } });
     }
   },
   components: {}

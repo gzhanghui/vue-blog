@@ -36,9 +36,7 @@ export default {
 @import '~common/styles/variable.styl';
 
 .share {
-  position: fixed;
-  right: 0;
-  top: 290px;
+
   background-color: $color-background-d;
   padding: 32px 0;
   z-index 4

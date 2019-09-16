@@ -1,15 +1,42 @@
 <template>
-  <div class="article-wrapper container" style="margin-bottom:200px">
-        <div v-html="articleHtml" ref="content" class="content "></div>
-       <comment/>
+  <el-scrollbar class="scroll">
+    <div class="article-wrapper container" style="margin-bottom:200px">
+      <div class="row">
+        <div class="col-md-8 ">
+          <div v-html="articleHtml" ref="content" class="content "></div>
     <div class="comment-wrap">
-      <div class="comment-title">
-
-        <h3>全部评论(21)</h3>
+      <comment @send="send"/>
+      <div class="comment-title" v-if="comment.comments&&comment.comments.length>0">
+        <h3>全部评论({{comment.comments.length}})</h3>
       </div>
-      <CommentList/>
+      <div class="comment-list">
+        <transition-group name="el-zoom-in-top">
+          <comment-list v-for="(item,index) in comment.comments"
+                        :comment="item"
+                        :key="item.id"
+                        @send="send(arguments,index)"
+                        @like="like(item.id)"
+                        @del="del(item.id)"
+          >
+            <div class="children" style="padding-left: 30px">
+              <transition-group name="el-zoom-in-top">
+                <comment-list v-for="(children) in item.children"
+                              :comment="children"
+                              :key="children.id"
+                              :islike="false"
+                              @send="send(arguments,index)"
+                              @del="del(children.id)"
+                />
+              </transition-group>
+            </div>
+          </comment-list>
+        </transition-group>
+      </div>
     </div>
-  </div>
+        </div>
+      </div>
+    </div>
+  </el-scrollbar>
 </template>
 
 <script type="text/ecmascript-6">
@@ -26,22 +53,25 @@ hljs.registerLanguage("css", css);
 hljs.registerLanguage("json", json);
 hljs.registerLanguage("xml", html); */
 
-import { getArticle } from "api/api";
+import {getArticle, getComments, comments, deleteComment, like} from "api/api";
 import Comment from "components/comment.vue";
 import CommentList from "components/comment-list.vue"
 export default {
   data() {
     return {
-      articleHtml: ""
+      articleHtml: "",
+      comment: {}
     };
   },
   mounted() {
-    // this._getArticle();
+    this._getArticle();
+    this._getComments()
   },
   components:{
     Comment,
-    CommentList
+    'CommentList': CommentList
   },
+
   methods: {
     _getArticle() {
       getArticle(this.$route.query.id).then(res => {
@@ -53,13 +83,97 @@ export default {
           });
         });
       });
+    },
+    _getComments() {
+      const noteId = this.$route.query.noteId;
+      getComments(noteId).then(res => {
+        this.comment = res.data
+      })
+    },
+    send(content, index) {
+      const noteId = this.$route.query.noteId;
+      let id = null;
+      let text = '';
+      if (index !== undefined) {
+        id = this.comment.comments[index].id;
+        text = content[0]
+      } else {
+        text = content
+      }
+
+      comments(noteId, text, id).then(res => {
+        const data = JSON.parse(res.data);
+        if (data.parent_id) {
+          this.$message.success('发表评论成功');
+          this.comment.comments.forEach((item, index) => {
+            if (data.parent_id === item.id) {
+              this.comment.comments[index].children.unshift(data)
+            }
+          })
+        } else {
+          this.comment.comments.unshift(data)
+        }
+      });
+    },
+    like(id) {
+      let fuck = null;
+      const index = this.comment.comments.findIndex((item) => {
+        return item.id === id
+      });
+      if (index > -1) {
+        if (this.comment.comments[index].liked === false) {
+          fuck = 1
+        }
+      }
+      like(id, fuck).then(res => {
+        if (index > -1) {
+          if (res.data === 'dislike_ok') {
+            this.comment.comments[index].liked = false;
+            this.comment.comments[index].likes_count -= 1
+          }
+          if (res.data === 'like_ok') {
+            this.comment.comments[index].liked = true;
+            this.comment.comments[index].likes_count += 1
+          }
+
+        }
+      })
+    },
+    del(id) {
+      deleteComment(id).then(res => {
+        if (res.code === 0) {
+          const data = JSON.parse(res.data);
+          if (data.parent_id === -1) {
+            const index = this.comment.comments.findIndex((item) => {
+              return item.id === data.id
+            });
+            if (index > -1) {
+              this.comment.comments.splice(index, 1);
+              this.$message.success('删除成功')
+            }
+          } else if (data.parent_id !== -1) {
+            const index = this.comment.comments.findIndex((item) => {
+              return item.id === data.parent_id
+            });
+            if (index > -1) {
+              const i = this.comment.comments[index].children.findIndex(item => {
+                return item.id === data.id
+              });
+              if (i > -1) {
+                this.comment.comments[index].children.splice(i, 1);
+                this.$message.success('删除成功')
+              }
+            }
+          }
+        }
+      })
     }
-  }
+  },
+
 };
 </script>
 
 <style   lang="stylus">
-/*  */
 @import '~highlight.js/styles/atom-one-dark.css';
 .article-wrapper {
   padding-top 56px
@@ -69,18 +183,20 @@ export default {
     padding-bottom: 40px;
     width: 620px;
   }
-  .comment-title
-  {
+
+  .comment-title {
     background #F2F6FC
+    margin-top 20px;
     h3{
       font-size 16px
       font-weight 600
       padding: 10px 20px;
     }
   }
-  
-  
 
+  .comment-list, .children {
+    transition all .3s
+  }
   .content .title {
     word-break: break-word !important;
     word-break: break-all;

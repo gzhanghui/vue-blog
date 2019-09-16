@@ -2,7 +2,7 @@
   <div class="player">
     <transition name="el-fade-in">
       <div class="avatar-wrapper">
-        <aplayer autoplay :float="false" :mini="true" :music="music" />
+        <aplayer autoplay :float="true" :mini="true" :music="music" v-if="music.src"></aplayer>
       </div>
     </transition>
     <!-- <div class="arrow" style="display:none">
@@ -13,7 +13,7 @@
   </div>
 </template>
 <script type="text/ecmascript-6">
-import { mapGetters, mapMutations } from "vuex";
+  import {mapGetters} from "vuex";
 import Aplayer from "vue-aplayer";
 export default {
   props: {
@@ -31,8 +31,7 @@ export default {
     music() {
       const data = this.comment;
       return {
-        src:
-          "https://webfs.yun.kugou.com/201909070150/62c3d414aaea1e50734a9c29fc62ab4e/G153/M04/13/14/OYcBAFz3fF6AbF0fADS_2OPt0ag626.mp3",
+        src: data["mp3_url"],
         title: data.title,
         artist: data.author,
         pic: data.images,
@@ -43,7 +42,15 @@ export default {
     },
    
     ...mapGetters(["comment"])
-  } 
+  },
+  methods: {
+    load() {
+      console.log('load')
+    },
+    canplay(a) {
+      console.log(a, 'canplay')
+    }
+  }
 };
 </script>
 
@@ -55,12 +62,13 @@ export default {
     display: inline-block;
     position: fixed;
     bottom: 50px;
-    left: 74px;
+    left: 64px;
     z-index: 4;
 
-    // width: 180px;
-    // height: 180px;
-    // background-color: $color-background-d;
+    @media screen and (max-width: 750px) {
+      left: -5px;
+      bottom: -5px;
+    }
     .icon {
       font-size: 38px;
       position: absolute;

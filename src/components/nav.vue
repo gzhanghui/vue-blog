@@ -1,8 +1,4 @@
 <template>
-  <div class="nav-wrap">
-    <div class="logo">
-      <img src="../common/image/03.png" alt/>
-    </div>
     <div class="nav">
       <ul>
         <router-link tag="li" class="nav-item" to="/">
@@ -40,7 +36,6 @@
         </li>
       </ul>
     </div>
-  </div>
 </template>
 <script>
     import {mapGetters} from "vuex";
@@ -67,15 +62,6 @@
 <style lang="stylus">
   @import '~common/styles/variable.styl';
 
-  .logo {
-    display: inline-block;
-    position: relative;
-    left: 74px;
-    top: 80px;
-    padding-bottom: 20px;
-    background: url('../common/image/05.png') no-repeat bottom;
-  }
-
   .user-popover {
     padding 16 12px
     background: $color-highlight-background url("../common/image/userbg.png") no-repeat;
@@ -98,14 +84,8 @@
       padding-left 12px
     }
   }
-
   .nav {
-    position: fixed;
-    right: 70px;
-    top: 0;
-    z-index: 3;
     background-color: $color-highlight-background;
-
     ul {
       padding-top: 80px;
       padding-bottom: 15px;

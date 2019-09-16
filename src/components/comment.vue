@@ -1,13 +1,13 @@
 <template>
   <div class="comment-wrap">
     <div class="comment-block">
-      <div class="textarea">
+      <div class="textarea" :class="{active:showSend}">
         <el-input
+          ref="input"
           @focus="showSend = true"
           v-model="content.content"
           type="textarea"
           autosize
-          class="input"
           resize="none"
           style="border-radius:0"
           placeholder="请输入内容"
@@ -34,7 +34,7 @@
             </div>
           </div>
           <div class="emoji" slot="reference">
-            <i class="iconfont icon-emoji1"></i>
+            <i class="iconfont icon-emoji1" id="emoji"></i>
           </div>
         </el-popover>
       </div>
@@ -48,7 +48,6 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {comments} from "api/api";
   import {emoji} from 'common/emoji/emoji'
 
   export default {
@@ -63,7 +62,13 @@
       };
     },
     mounted() {
-      // this.showSend = true
+      document.body.addEventListener('click', (e) => {
+        if (e.target.id === 'emoji' || e.target.nodeName === 'TEXTAREA') {
+          return false
+        } else {
+          this.showSend = false
+        }
+      })
     },
     computed: {
       emojiList() {
@@ -88,9 +93,7 @@
         this.tabActive = index
       },
       send() {
-        comments(this.content).then(res => {
-          console.log(res);
-        });
+        this.$emit('send',this.content.content);
       }
     },
     components: {}
@@ -100,7 +103,7 @@
 <style scoped lang="stylus">
   @import '~common/styles/variable.styl';
   .comment-block {
-    display: flex;
+    position relative
   }
 
   .emoji-panel {
@@ -166,15 +169,17 @@
 
   .textarea {
     position: relative;
-    flex: 1;
-    margin-right: 28px;
+    z-index 2;
     font-family Microsoft YaHei
     transition: all 0.3s;
 
+    &.active {
+      margin-right: 80px !important
+    }
     .emoji {
       position: absolute;
       right: 10px;
-      bottom: 6px;
+      bottom: 0px;
 
       .iconfont {
         user-select none
@@ -186,5 +191,12 @@
         }
       }
     }
+  }
+
+  .send {
+    position absolute
+    right 0
+    top 0
+    z-index 1;
   }
 </style>

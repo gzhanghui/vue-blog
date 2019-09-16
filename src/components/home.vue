@@ -1,17 +1,21 @@
 <template>
   <div class="home-wrapper">
-    <el-row :gutter="10">
-      <el-col
-        :xs="{span: 20, offset: 1}"
-        :sm="{span: 20, offset: 1}"
-        :md="{span: 20, offset: 4}"
-        :lg="{span: 16, offset: 3}"
-      >
-        <div class="hot-comment" v-if="data.comment_content">
-          <p>{{data.comment_content}}</p>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-1 col-sm-2">
+          <div class="logo-wrap  hidden-print hidden-xs pull-right">
+            <div class="logo">
+              <img src="../common/image/03.png" width="60" alt/>
+            </div>
+          </div>
         </div>
-      </el-col>
-    </el-row>
+        <div class="col-md-11 col-sm-10">
+          <div class="hot-comment" v-if="data.comment_content">
+            <p>{{data.comment_content}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="bg-wrapper">
       <div class="content">
         <div class="ball"></div>
@@ -61,20 +65,24 @@ export default {
 .home-wrapper {
   height: 100%;
   width: 100%;
-  overflow hidden
+  flex 1
+  position relative
   .hot-comment {
     display: inline-block;
     writing-mode: vertical-rl;
     max-height: 400px;
     line-height: 32px;
-    padding-top: 100px;
-    margin-left: -30px;
     color: $color-text-d;
   }
-
+  .logo {
+    display: inline-block;
+    padding-bottom: 20px;
+    margin-top: -20px
+    background: url('../common/image/05.png') no-repeat bottom;
+  }
   .bg-wrapper {
     position: absolute;
-    top: 0;
+    top: -60px;
     left: 0;
     bottom: 0;
     right: 0;
