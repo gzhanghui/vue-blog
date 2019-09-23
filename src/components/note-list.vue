@@ -3,23 +3,23 @@
     <el-scrollbar class="scroll">
         <div class="list-container container">
           <div class="row">
-           <div class="col-md-8 ">
+           <div class="col-md-8">
              <ul class="note-list" v-if="noteList.length>0">
                <li :data-note-id="item.noteId" v-for="item in noteList" :key="item.noteId">
                  <div class="line">
                    <i class="iconfont icon-line"></i>
                  </div>
                  <div class="content">
-                   <h2 class="title" @click="goArticle(item.articleId,item.noteId)">{{item.title}}</h2>
+                   <h3 class="title" @click="goArticle(item)">{{item.title}}</h3>
                    <p class="abstract">{{item.abstract}}</p>
                    <div class="meta">
-                     <a class="read-btn" @click="goArticle(item.articleId,item.noteId)" href="javascript:;">阅读全文</a>
+                     <a class="read-btn " @click="goArticle(item)" href="javascript:;">阅读全文</a>
                      <span>
-                    <i class="iconfont icon-eye1"></i>
+                    <i class="iconfont icon-attention"></i>
                     <b>{{item.read}}</b>
                   </span>
                      <span>
-                    <i class="iconfont icon-message"></i>
+                    <i class="iconfont icon-comment"></i>
                     <b>{{item.comments}}</b>
                   </span>
                      <span>
@@ -27,7 +27,7 @@
                     <b>{{item.like}}</b>
                   </span>
                      <span class="time">
-                    <i class="icon-time-circle iconfont"></i>
+                    <i class="icon-time iconfont"></i>
                     <b>{{item.time}}</b>
                   </span>
                    </div>
@@ -55,12 +55,12 @@ export default {
   methods: {
     _getNoteList() {
       getNoteList().then(res => {
-        this.noteList = res.data;
+        this.noteList = res;
         console.log(res);
       });
     },
-    goArticle(id,noteId) {
-      this.$router.push({ name: "article", query: { id: id,noteId:'46280711' } });
+    goArticle(item) {
+      this.$router.push({ name: "article", query: { id: item.articleId, noteId:item.noteId },params:{noteData:JSON.stringify(item)} });
     }
   },
   components: {}
@@ -72,22 +72,20 @@ export default {
 
 .list-wrapper {
   box-sizing: border-box;
-  padding-top: 74px;
+  padding-top: 40px;
 
   .note-list {
     & > li {
-      margin-bottom: 35px;
-      color: $color-text-d;
-      font-size: $font-size-medium;
-
+      margin 16px 0
+      position relative
       .line {
+        position absolute
+        top -16px
+        left -2px
         .iconfont {
           color: $color-theme;
-          font-size: 27px;
+          font-size: 26px;
         }
-
-        margin-bottom: 10px;
-        // transform: scale(0.75);
       }
     }
 
@@ -96,32 +94,33 @@ export default {
         display: inline-block;
         font-size: $font-size-large;
         color: $color-theme;
-        font-weight: 500;
-        padding: 16px 0;
         cursor: pointer;
       }
 
       .abstract {
-        line-height: 1.75;
+        line-height: 2;
       }
 
       .meta {
-        padding-top: 15px;
         font-size: $font-size-small;
-
         .iconfont {
           font-size: 13px;
         }
 
         .read-btn {
           color: $color-sub-theme;
-          font-size: $font-size-medium;
+          font-size: 14px;
         }
 
         a, span {
+          vertical-align middle
+          line-height 18px
           margin-right: 5px;
           font-size: 13px;
           color: $color-text-d;
+          b{
+            font-weight 400
+          }
         }
       }
     }

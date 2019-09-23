@@ -14,8 +14,8 @@
           </div>
           <div class="tool">
             <div>
-              <button class="button"  v-if="islike" @click="like"><i class="iconfont icon-dianzan2-copy" :class="{liked:comment.liked}"></i><span>{{comment.likes_count}}</span></button>
-              <button class="button" @click="toggleComment"><i class="iconfont icon-huifu1"></i><span>{{reply}}</span>
+              <button class="button"  v-if="islike" @click="like"><i class="iconfont icon-likefill" :class="{liked:comment.liked}"></i><span>{{comment.likes_count}}</span></button>
+              <button class="button" @click="toggleComment"><i class="iconfont icon-huifu"></i><span>{{reply}}</span>
               </button>
               <el-popover
                 placement="top"
@@ -26,7 +26,7 @@
                   <el-button size="mini" type="text" @click="delVisible = false">取消</el-button>
                   <el-button type="text" size="mini" @click="del">确定</el-button>
                 </div>
-                <button class="button"   slot="reference"> <i class="el-icon-delete-solid" ></i><span>删除</span></button>
+                <button class="button"   slot="reference"> <i class="iconfont icon-deletefill" ></i><span>删除</span></button>
               </el-popover>
             </div>
             <el-collapse-transition>

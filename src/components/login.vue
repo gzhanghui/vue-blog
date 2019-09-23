@@ -60,7 +60,7 @@ export default {
         this._loginStatus()
     },
     computed: {
-        ...mapGetters(["loginModel", "loginState"])
+        ...mapGetters(["loginModel", "loginInfo"])
     },
     methods: {
         click() {
@@ -71,24 +71,23 @@ export default {
             this.setLoginModel(false);
         },
         showModel() {
-            if (!this.loginState) {
+            if (!this.loginInfo) {
                 this.setLoginModel(true);
             }
         },
         _loginStatus() {
             loginStatus().then((res) => {
-                if (res.data.user_signed_in) {
-                    this.setLoginState(res.data.user_signed_in);
+                if (res) {
+                    this.setLoginInfo(res);
                 }
             })
         },
         _captchas() {
-            if (this.loginState) {
+            if (this.loginInfo) {
                 return
             }
             captchas().then(res => {
-                const captcha = JSON.parse(res.data);
-                console.log(res.data);
+                const captcha =res;
                 window.initGeetest(
                     {
                         gt: captcha.gt,
@@ -123,8 +122,8 @@ export default {
             login(getValidate).then(res => {
                 console.log(res);
                 if (res.code === 0) {
-                    const data = res.data;
-                    this.setLoginState(data.user_signed_in);
+                    const data = res;
+                    this.setLoginInfo(data);
 
                     if (data.user_signed_in) {
                         this.setLoginModel(false);
@@ -138,9 +137,9 @@ export default {
             const token = localStorage.getItem("authenticity_token");
             sign_out(token).then(res => {
                 if (res.code === 0) {
-                    const data = res.data;
+                    const data = res;
                     if (!data.user_signed_in) {
-                        this.setLoginState(data.user_signed_in);
+                        this.setLoginInfo(data);
                         this.$message.info("退出成功");
                     }
                 }
@@ -148,7 +147,7 @@ export default {
         },
         ...mapMutations({
             setLoginModel: "SET_LONGIN_MODEL",
-            setLoginState: "SET_LONGIN_STATE"
+            setLoginInfo: "SET_LONGIN_INFO"
         })
     }
 };

@@ -1,6 +1,6 @@
 const state = {
     comment: {},
-    loginState:false,
+    loginInfo:{user_signed_in:false},
     loginModel:false
 }
 

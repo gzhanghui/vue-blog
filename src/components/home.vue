@@ -63,16 +63,21 @@ export default {
 @import '~common/styles/variable.styl';
 
 .home-wrapper {
-  height: 100%;
-  width: 100%;
-  flex 1
-  position relative
+  position fixed
+  top: 80px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index 0;
   .hot-comment {
     display: inline-block;
     writing-mode: vertical-rl;
     max-height: 400px;
-    line-height: 32px;
     color: $color-text-d;
+    p{
+      letter-spacing: 4px;
+      line-height: 32px;
+    }
   }
   .logo {
     display: inline-block;
@@ -82,7 +87,7 @@ export default {
   }
   .bg-wrapper {
     position: absolute;
-    top: -60px;
+    top: -80px;
     left: 0;
     bottom: 0;
     right: 0;

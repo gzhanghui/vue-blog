@@ -16,9 +16,9 @@
           <span>关于</span>
         </router-link>
         <li @click="handleLoginBtn" class="nav-item">
-          <span v-if="loginState === false">登录</span>
+          <span v-if="loginInfo.user_signed_in === false">登录</span>
           <el-popover
-                  v-if="loginState === true"
+                  v-if="loginInfo.user_signed_in === true"
                   trigger="hover"
                   popper-class="user-popover"
                   placement="left-start"
@@ -26,12 +26,12 @@
                   v-model="visible">
             <div class="user-panel">
               <div class="info">
-                <img width="42" class="avatar" src="http://face.cms.7yue.pro/img/avatar.fe758668.png" alt="">
-                <div class="nickname">张辉_8f48</div>
+                <img width="42" class="avatar" :src="loginInfo.current_user.avatar" alt="">
+                <div class="nickname">{{loginInfo.current_user.nickname}}</div>
               </div>
             </div>
             <el-button type="text" @click="signOut">退出登录</el-button>
-            <span v-if="loginState === true" slot="reference">退出</span>
+            <span v-if="loginInfo.user_signed_in === true" slot="reference">退出</span>
           </el-popover>
         </li>
       </ul>
@@ -41,7 +41,7 @@
     import {mapGetters} from "vuex";
     export default {
         computed: {
-            ...mapGetters(["loginModel", "loginState"])
+            ...mapGetters(["loginModel", "loginInfo"])
         },
         data() {
             return {

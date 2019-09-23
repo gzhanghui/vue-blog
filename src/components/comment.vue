@@ -10,7 +10,7 @@
           autosize
           resize="none"
           style="border-radius:0"
-          placeholder="请输入内容"
+          placeholder="请输入你的评论"
         ></el-input>
         <el-popover
           placement="bottom-end"
@@ -28,13 +28,13 @@
                     :key="index"
                     @click="select"
                     v-show="index===tabActive">
-                  <span :key="code.code" v-for="(code,i) in item" :data-index="i">{{code.text}}</span>
+                  <span class="emoji-item" :key="code.code" v-for="(code,i) in item" :data-index="i">{{code.text}}</span>
                 </li>
               </ul>
             </div>
           </div>
           <div class="emoji" slot="reference">
-            <i class="iconfont icon-emoji1" id="emoji"></i>
+            <i class="iconfont icon-emoji" id="emoji"></i>
           </div>
         </el-popover>
       </div>
@@ -55,7 +55,7 @@
       return {
         showSend: false,
         content: {
-          content: "这是一个测试"
+          content: ""
         },
         emojiTabCount: 4,
         tabActive: 0
@@ -133,7 +133,7 @@
     .emoji-container {
       margin-top 10px
 
-      span {
+      .emoji-item {
         user-select none
         transition background-color .3s
         display: inline-flex;
@@ -177,17 +177,16 @@
       margin-right: 80px !important
     }
     .emoji {
+      line-height normal
       position: absolute;
       right: 10px;
-      bottom: 0px;
+      bottom: 6px;
 
       .iconfont {
         user-select none
         font-size 20px
         cursor pointer
-
         &:hover {
-          color #0ab70e
         }
       }
     }

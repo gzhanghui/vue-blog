@@ -1,5 +1,5 @@
 const path = require('path');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const cheerio = require('cheerio');
 const request = require('request');
 const fs = require('fs');
@@ -21,16 +21,14 @@ module.exports = {
     devServer: {
 
         before: function (app) {
+          app.use(bodyParser.json()); //数据JSON类型
+          app.use(bodyParser.urlencoded({extended: false}));
             /*登录状态*/
             app.get('/api/loginStatus', async (req, res) => {
                 try {
                     const cookies = await readCookies('cookies');
                     const loginInfo = await getLoginStatus(cookies);
-                    res.json({
-                        code: 0,
-                        data: loginInfo,
-                        msg: 'success'
-                    })
+                    res.json(loginInfo)
                 } catch (err) {
                     console.log(err);
                 }
@@ -39,7 +37,7 @@ module.exports = {
             /*提交评论*/
             app.post('/api/comments', bodyParser.json(), async (req, res) => {
                 try {
-                    console.log(req.body)
+                    console.log(req.body);
                     let j = request.jar();
                     const cookies = await readCookies('cookies');
                     const headers = {
@@ -50,20 +48,77 @@ module.exports = {
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
                         cookie: cookies
                     };
-
-                    const url = 'https://www.jianshu.com/notes/46280711/comments';
+                    const params = req.body;
+                    console.log(params);
+                    const url = `https://www.jianshu.com/notes/${params.noteId}/comments`;
                     request.post({url: url, jar: j, form: req.body, headers: headers}, (error, response, data) => {
-                        res.json({
-                            code: 0,
-                            data: data,
-                            msg: 'success'
-                        })
+                        res.json(data)
                     })
 
                 } catch (err) {
                     console.log(err);
                 }
             });
+          /*删除评论*/
+          app.post('/api/deleteComment', bodyParser.json(), async (req, res) => {
+            try {
+              console.log(req.body);
+              let j = request.jar();
+              const cookies = await readCookies('cookies');
+              const headers = {
+                'accept': 'application/json',
+                'content-type': 'application/json;charset=UTF-8',
+                'origin': 'https: //www.jianshu.com',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+                cookie: cookies
+              };
+              const params = req.body;
+              console.log(params);
+              const url = `https://www.jianshu.com/shakespeare/comments/${params.id}`;
+              request.delete({url: url, jar: j, form: req.body, headers: headers}, (error, response, data) => {
+                res.json(data)
+              })
+            } catch (err) {
+              console.log(err);
+            }
+          });
+          /*点赞评论*/
+          app.post('/api/like', bodyParser.json(), async (req, res) => {
+            try {
+              console.log(req.body)
+              let j = request.jar();
+              const cookies = await readCookies('cookies');
+              const headers = {
+                'accept': 'application/json',
+                'content-type': 'application/json;charset=UTF-8',
+                'origin': 'https: //www.jianshu.com',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+                cookie: cookies
+              };
+              const params = req.body;
+              console.log(params);
+              const url = `https://www.jianshu.com/shakespeare/comments/${params.id}/like`;
+              if(params.fuck===1){
+                request.post({url: url, jar: j, form: req.body, headers: headers}, (error, response, data) => {
+                  if(data.trim().length===0){
+                    data='like_ok'
+                  }
+                  res.json(data)
+                })
+              }else{
+                request.delete({url: url, jar: j, form: req.body, headers: headers}, (error, response, data) => {
+                  if(data.trim().length===0){
+                    data='dislike_ok'
+                  }
+                  res.json(data)
+                })
+              }
+
+
+            } catch (err) {
+              console.log(err);
+            }
+          });
             /*获取文章列表*/
             app.get('/api/noteList', (req, res) => {
                 const params = req.query;
@@ -76,28 +131,50 @@ module.exports = {
                     },
                 },(error,response,data)=>{
                     const content = noteList(data);
-                    res.json({
-                        data: content,
-                        msg: 'success',
-                        code: 0
-                    })
+                    res.json(content)
                 })
             });
+          /*获取评论列表*/
+          app.get('/api/getComments', async (req, res) => {
+            try {
+              const params = req.query;
+              console.log(params);
+              const url=`https://www.jianshu.com/shakespeare/notes/${params.noteId}/comments?page=${params.page}&count=${params.count}&author_only=${params.author_only}&order_by=${params.order_by}`
+
+              request.get({
+                url: url
+              },(error,response,data)=>{
+                const _data = JSON.parse(data);
+                if(_data.comments){
+                  _data.comments.forEach((item)=>{
+                      item.created_at = formatDate(item.created_at);
+                    if(item.children.length>0){
+                      item.children.forEach(time=>{
+                        time.created_at =formatDate(time.created_at)
+                      })
+                    }
+                  })
+                }
+                res.json(_data)
+              })
+            } catch (err) {
+              console.log(err);
+            }
+
+          });
             /*获取文章内容*/
             app.get('/api/article', (req, res) => {
                 const url = 'https://www.jianshu.com/p/' + req.query.id;
                 request.get({url: url}, (error, response, body) => {
                     const $ = cheerio.load(body);
                     $('img').each(function () {
-                        const src = $(this).attr('data-original-src')
+                        const src = $(this).attr('data-original-src');
                         $(this).attr('src', 'https:' + src)
                     });
-                    $('.author').remove()
-                    const articleHtml = $('.article').html()
+                    $('.author').remove();
+                    const articleHtml = $('article').html();
                     const data = {
-                        data: articleHtml,
-                        msg: 'success',
-                        code: 0
+                        data: articleHtml
                     };
                     res.json(data)
                 })
@@ -112,16 +189,11 @@ module.exports = {
                         host: 'www.jianshu.com'
                     }
                 }, (error, response, data) => {
-                    res.json({
-                        data: data,
-                        msg: 'success',
-                        code: 0
-                    })
+                    res.json(data)
                 })
             });
             /* 登录 */
-            app.use(bodyParser.json()); //数据JSON类型
-            app.use(bodyParser.urlencoded({extended: false}));
+
             app.post('/api/login', function (req, res) {
                 let j = request.jar();
                 request.get({url: 'https://www.jianshu.com/sign_in', jar: j}, (error, response, body) => {
@@ -142,11 +214,7 @@ module.exports = {
                         try {
                             const cookie = j.getCookieString(url);
                             const loginInfo = await getLoginStatus(cookie);
-                            res.json({
-                                code: 0,
-                                data: loginInfo,
-                                msg: 'success'
-                            })
+                            res.json(loginInfo)
                         } catch (err) {
                             console.log(err);
                         }
@@ -174,11 +242,7 @@ module.exports = {
                         try {
                             const cookie = j.getCookieString(url);
                             const loginInfo = await getLoginStatus(cookie);
-                            res.json({
-                                code: 0,
-                                data: loginInfo,
-                                msg: 'success'
-                            })
+                            res.json(loginInfo)
                         } catch (err) {
                             console.log(err);
                         }

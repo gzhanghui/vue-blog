@@ -25,7 +25,7 @@ export function getNoteList(page, order_by, author) {
 export function getArticle(id) {
     const url = '/api/article';
     const params = {
-        id: id
+        id
     };
     return axios.get(url, {
         params: params
@@ -91,7 +91,9 @@ export function sign_out(authenticity_token) {
 export function comments(noteId,content,parent_id) {
     const url = '/api/comments';
     const params={
-      content:content,parent_id:parent_id,noteId
+      content:content,
+      parent_id:parent_id,
+      noteId
     };
     if(params.parent_id===null){
       delete params.parent_id

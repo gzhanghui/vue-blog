@@ -1,17 +1,19 @@
 <template>
   <div id="app">
-    <vue-drawer-layout ref="drawer" :enable="enable">
+    <vue-drawer-layout ref="drawer" :enable="enable" :drawer-width="300">
       <div class="drawer-menu" slot="drawer">
-        <v-menu @sign-in="signIn" @sign-out="signOut"></v-menu>
+        <v-menu @sign-in="signIn" @sign-out="signOut" @close="toggleDrawer"></v-menu>
       </div>
       <div slot="content" class="drawer-content-wrap">
         <el-container>
-          <el-header height="80px">
+          <el-header height="60px" style="position: relative;z-index: 1;">
             <div class="container">
               <div class="row">
                 <div class="col-md-8">
                   <transition name="el-zoom-in-top">
-                    <div class="top-logo" v-show="route!=='home'"><img width="130" src="./common/image/09.png" alt="">
+                    <div class="top-logo hidden-sm-and-up" >
+                      <div class="menu-icon" @click="toggleDrawer" ><i class="icon-menu iconfont"></i></div>
+                     <div class="logo-pic"><img width="130" src="./common/image/09.png" alt=""></div>
                     </div>
                   </transition>
                 </div>
@@ -27,11 +29,13 @@
             </div>
             <player :show="transition.cd"></player>
             <div class="view">
+              <el-scrollbar class="scroll">
               <transition name="slide" mode="out-in">
                 <keep-alive>
                   <router-view/>
                 </keep-alive>
               </transition>
+              </el-scrollbar>
             </div>
             <el-backtop target=".view"></el-backtop>
             <div id="captcha" ref="captcha" style="display:none"></div>
@@ -74,6 +78,7 @@
     mounted() {
       this.route = this.$route.name;
       window.addEventListener('resize', () => {
+      //  const width=document.body.clientWidth;
         this.enable = !!_isMobile();
       })
     },
@@ -85,6 +90,9 @@
       signOut(){
           this.$refs.loginCom._sign_out()
       },
+      toggleDrawer(){
+          this.$refs.drawer.toggle()
+      }
   },
     computed: {},
   watch: {
@@ -108,33 +116,51 @@
 <style lang="stylus">
 @import 'common/styles/index.styl';
 @import "https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css";
-@import "common/styles/docs.min.css"
 html {
   height 100%
 }
 
 body {
   height 100%
+  color $color-theme
+  font-size $font-size
+  font-family: Avenir,Chinese Quote,PingFang SC,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.drawer-menu {
-  background-color #ffffff
-  height 100%
-}
+
 #app {
   box-sizing: border-box;
   height 100%;
   display flex
-
-  .top-logo {
-    img {
-      margin-top 18px
-    }
+  .drawer-menu {
+    background-color #ffffff
+    height 100%
   }
+  .top-logo {
+    display flex
 
+    .menu-icon{
+      margin-left -20px
+      .iconfont{
+        display inline-block
+        font-size 20px
+        padding 6px
+        margin-top 16px
+        cursor pointer
+      }
+    }
+    .logo-pic{
+      flex 1
+      margin-left 20px
+      img {
+        margin-top 18px
+      }
+    }
+
+  }
   .scroll {
     height 100%
-
     .el-scrollbar__wrap {
       overflow-x hidden
     }
@@ -143,7 +169,7 @@ body {
   .nav-wrap {
     position: fixed;
     right: 70px;
-  top: 0;
+    top: 0;
     z-index: 3;
   }
 
@@ -151,11 +177,11 @@ body {
     position: fixed;
     right: 0;
     top: 290px;
+    z-index: 3;
   }
 
   .view {
     height 100%
-
   }
 }
 

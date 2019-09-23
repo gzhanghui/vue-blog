@@ -3,13 +3,13 @@
     <div class="share" v-show="show">
       <ul>
         <li class="share-item share-item-3">
-          <i class="iconfont icon-github-fill"></i>
+          <i class="iconfont icon-github"></i>
         </li>
         <li class="share-item share-item-2">
-          <i class="iconfont icon-QQ-circle-fill"></i>
+          <i class="iconfont icon-QQ"></i>
         </li>
         <li class="share-item share-item-1">
-          <i class="iconfont icon-weibo-circle-fill"></i>
+          <i class="iconfont icon-weibo1"></i>
         </li>
       </ul>
     </div>
@@ -51,25 +51,25 @@ export default {
     &:hover {
       background-color: $color-text-l;
 
-      .icon-QQ-circle-fill {
+      .icon-QQ {
         color: #00a0e9;
       }
 
-      .icon-weixin {
-        color: #0ab70e;
+      .icon-github {
+        color: #8799a3;
       }
 
-      .icon-weibo-circle-fill {
+      .icon-weibo1 {
         color: #fb373a;
       }
     }
-
     .iconfont {
-      font-size: 32px;
+      font-size: 26px;
       line-height: 70px;
       color: $color-text-d;
-      transition: color 0.1s;
+      transition: color 0.3s;
     }
+
   }
 }
 </style>
