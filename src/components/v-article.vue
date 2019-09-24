@@ -38,9 +38,8 @@
 </template>
 
 <script type="text/ecmascript-6">
-import hljs from "highlight.js";
-
-/*
+  /*import hljs from "highlight.js";
+  */
 import hljs from "highlight.js/lib/highlight";
 import javascript from "highlight.js/lib/languages/javascript";
 import css from "highlight.js/lib/languages/css";
@@ -49,7 +48,7 @@ import html from "highlight.js/lib/languages/xml";
 hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("css", css);
 hljs.registerLanguage("json", json);
-hljs.registerLanguage("xml", html); */
+hljs.registerLanguage("xml", html);
 import {mapGetters} from 'vuex';
 import {getArticle, getComments, comments, deleteComment, like} from "api/api";
 import Comment from "components/comment.vue";

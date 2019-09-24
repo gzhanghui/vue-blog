@@ -71,7 +71,7 @@ export default {
             this.setLoginModel(false);
         },
         showModel() {
-            if (!this.loginInfo) {
+            if (!this.loginInfo.user_signed_in) {
                 this.setLoginModel(true);
             }
         },
@@ -83,11 +83,11 @@ export default {
             })
         },
         _captchas() {
-            if (this.loginInfo) {
+            if (this.loginInfo.user_signed_in) {
                 return
             }
-            captchas().then(res => {
-                const captcha =res;
+            captchas().then(res =>  {
+                const captcha =JSON.parse(res);
                 window.initGeetest(
                     {
                         gt: captcha.gt,
@@ -121,7 +121,7 @@ export default {
             this.loading = true;
             login(getValidate).then(res => {
                 console.log(res);
-                if (res.code === 0) {
+                if (res.user_signed_in === true) {
                     const data = res;
                     this.setLoginInfo(data);
 
