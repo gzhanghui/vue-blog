@@ -1,8 +1,8 @@
 <template>
-    <div class="article-wrapper container" style="margin-bottom:200px">
+    <div class="article-wrapper container">
       <div class="row">
         <div class="col-md-8">
-          <div v-html="articleHtml" ref="content" class="content "></div>
+          <div v-html="articleHtml" ref="content" class="content"></div>
           <div class="comment-wrap">
               <comment @send="send"/>
               <div class="comment-title" v-if="comment.comments&&comment.comments.length>0">
@@ -185,7 +185,7 @@ export default {
 <style   lang="stylus">
 @import '~highlight.js/styles/atom-one-dark.css';
 .article-wrapper
-  padding-top 56px
+  padding-top 122px
 
   .note .post
     margin: 0 auto;

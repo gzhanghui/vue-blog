@@ -1,6 +1,5 @@
 <template>
   <div class="list-wrapper ">
-    <el-scrollbar class="scroll">
         <div class="list-container container">
           <div class="row">
            <div class="col-md-8">
@@ -13,23 +12,23 @@
                    <h3 class="title" @click="goArticle(item)">{{item.title}}</h3>
                    <p class="abstract">{{item.abstract}}</p>
                    <div class="meta">
-                     <a class="read-btn " @click="goArticle(item)" href="javascript:;">阅读全文</a>
+                     <button class="read-btn " @click="goArticle(item)">阅读全文</button>
                      <span>
-                    <i class="iconfont icon-attention"></i>
-                    <b>{{item.read}}</b>
-                  </span>
+                        <i class="iconfont icon-attention"></i>
+                        <b>{{item.read}}</b>
+                     </span>
                      <span>
-                    <i class="iconfont icon-comment"></i>
-                    <b>{{item.comments}}</b>
-                  </span>
+                        <i class="iconfont icon-comment"></i>
+                        <b>{{item.comments}}</b>
+                     </span>
                      <span>
-                    <i class="iconfont icon-like"></i>
-                    <b>{{item.like}}</b>
-                  </span>
+                        <i class="iconfont icon-like"></i>
+                        <b>{{item.like}}</b>
+                     </span>
                      <span class="time">
-                    <i class="icon-time iconfont"></i>
-                    <b>{{item.time}}</b>
-                  </span>
+                        <i class="icon-time iconfont"></i>
+                        <b>{{item.time}}</b>
+                     </span>
                    </div>
                  </div>
                </li>
@@ -37,7 +36,6 @@
            </div>
           </div>
         </div>
-    </el-scrollbar>
   </div>
 </template>
 
@@ -59,8 +57,8 @@ export default {
         console.log(res);
       });
     },
-    goArticle(item) {
-      this.$router.push({ name: "article", query: { id: item.articleId, noteId:item.noteId },params:{noteData:JSON.stringify(item)} });
+    async goArticle(item) { 
+       await this.$router.push({ name: "article", query: { id: item.articleId, noteId:item.noteId },params:{noteData:JSON.stringify(item)} });
     }
   },
   components: {}
@@ -109,10 +107,15 @@ export default {
 
         .read-btn {
           color: $color-sub-theme;
+          background-color transparent;
+          padding 0;
+          border 0;
+          outline 0;
+          text-align left
           font-size: 14px;
         }
 
-        a, span {
+        button, span {
           vertical-align middle
           line-height 18px
           margin-right: 5px;

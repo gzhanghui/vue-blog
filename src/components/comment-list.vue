@@ -1,7 +1,7 @@
 <template>
   <div class="comment-wrap">
     <div class="comment-list">
-      <div class="content-wrap">
+      <div class="comment-content-wrap">
         <div class="user">
           <a href="#" class="avatar" :data-id="comment.user.id" :data-slug="comment.user.slug">
             <img :src="comment.user.avatar" alt="">
@@ -113,7 +113,7 @@
     line-height: 1.7;
     padding: 12px 0 20px 10px;
     font-size: 15px;
-    .content-wrap {
+    .comment-content-wrap {
       padding-top: 12px
       position: relative;
 
@@ -189,7 +189,7 @@
           color #76839b
         }
         i.liked{
-          color red
+          color $color-sub-theme
         }
       }
     }

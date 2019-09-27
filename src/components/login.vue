@@ -136,13 +136,11 @@ export default {
         _sign_out() {
             const token = localStorage.getItem("authenticity_token");
             sign_out(token).then(res => {
-                if (res.code === 0) {
                     const data = res;
                     if (!data.user_signed_in) {
                         this.setLoginInfo(data);
                         this.$message.info("退出成功");
                     }
-                }
             });
         },
         ...mapMutations({

@@ -3,7 +3,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import 'element-ui/lib/theme-chalk/display.css';
-import {Button, Row, Col, Icon, Dialog, Input, Link, Backtop, Message, Popover,Collapse,Container,Main,Header,Scrollbar} from 'element-ui';
+import './element-variables.scss'
+import {Button, Row, Col, Icon, Dialog, Input, Link, Backtop, Message, Popover,Collapse,Container,Main,Header,Scrollbar, Form,
+  FormItem} from 'element-ui';
 import DrawerLayout from 'vue-drawer-layout'
 
 Vue.config.productionTip = false;
@@ -22,6 +24,8 @@ Vue.use(Main);
 Vue.use(Container);
 Vue.use(Header);
 Vue.use(Scrollbar);
+Vue.use(Form);
+Vue.use(FormItem);
 Vue.use(DrawerLayout);
 
 Vue.prototype.$message = Message;

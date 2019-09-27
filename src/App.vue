@@ -4,51 +4,45 @@
       <div class="drawer-menu" slot="drawer">
         <v-menu @sign-in="signIn" @sign-out="signOut" @close="toggleDrawer"></v-menu>
       </div>
-      <div slot="content" class="drawer-content-wrap">
-        <el-container>
-          <el-header height="60px" style="position: relative;z-index: 1;">
+      <div slot="content" class="drawer-content-wrap" id="scroll">
+        <el-scrollbar class="scroll">
+          <div class="header">
             <div class="container">
               <div class="row">
                 <div class="col-md-8">
                   <transition name="el-zoom-in-top">
                     <div class="top-logo hidden-sm-and-up" >
                       <div class="menu-icon" @click="toggleDrawer" ><i class="icon-menu iconfont"></i></div>
-                     <div class="logo-pic"><img width="130" src="./common/image/09.png" alt=""></div>
+                      <div class="logo-pic"><img width="130" src="./common/image/09.png" alt=""></div>
                     </div>
                   </transition>
                 </div>
               </div>
             </div>
-          </el-header>
-          <el-main style="padding:0">
-            <div class="nav-wrap hidden-sm-and-down">
+          </div>
+
+          <div class="nav-wrap hidden-sm-and-down">
               <nav-bar @sign-in="signIn" @sign-out="signOut"></nav-bar>
             </div>
-            <div class="share-wrap  hidden-sm-and-down">
-              <share :show="transition.share"></share>
-            </div>
+
             <player :show="transition.cd"></player>
-            <div class="view">
-              <el-scrollbar class="scroll">
+          <div class="router-view">
               <transition name="slide" mode="out-in">
                 <keep-alive>
                   <router-view/>
                 </keep-alive>
               </transition>
-              </el-scrollbar>
             </div>
-            <el-backtop target=".view"></el-backtop>
+          <el-backtop target=".el-scrollbar__wrap" :visibility-height="100"></el-backtop>
             <div id="captcha" ref="captcha" style="display:none"></div>
             <login ref="loginCom"/>
-          </el-main>
-        </el-container>
+        </el-scrollbar>
       </div>
     </vue-drawer-layout>
   </div>
 </template>
 <script>
   import NavBar from "components/nav";
-  import Share from "components/share";
   import Player from "components/player";
   import Login from "components/login";
   import VMenu from "components/menu";
@@ -60,7 +54,6 @@
   export default {
   components: {
     NavBar,
-    Share,
     Player,
     Login,
     VMenu
@@ -68,8 +61,7 @@
   data() {
     return {
       transition: {
-        cd: true,
-        share: true
+        cd: true
       },
       enable: _isMobile(),
       route: 'home'
@@ -98,13 +90,7 @@
   watch: {
     $route(to) {
       this.route = to.name;
-      if (to.name !== "home") {
-        this.transition.share = false;
-        this.transition.cd = false;
-      } else {
-        this.transition.share = true;
-        this.transition.cd = true;
-      }
+      this.transition.cd = to.name === "home";
     },
     enable() {
       //TODO refresh
@@ -132,10 +118,29 @@ body {
 #app {
   box-sizing: border-box;
   height 100%;
-  display flex
   .drawer-menu {
     background-color #ffffff
     height 100%
+  }
+
+  .header {
+    height 60px
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    z-index: 10;
+    background: #fff;
+    position: fixed;
+
+    &.s_down {
+      box-shadow: 0 0 5px #888;
+    }
+  }
+
+  .el-scrollbar__bar {
+    &.is-vertical {
+      z-index 11
+    }
   }
   .top-logo {
     display flex
@@ -170,18 +175,14 @@ body {
     position: fixed;
     right: 70px;
     top: 0;
-    z-index: 3;
+    z-index: 11;
   }
 
   .share-wrap {
     position: fixed;
     right: 0;
     top: 290px;
-    z-index: 3;
-  }
-
-  .view {
-    height 100%
+    z-index: 10;
   }
 }
 
@@ -191,6 +192,12 @@ body {
   word-break: break-all;
 }
 
+.drawer-content-wrap {
+  height 100%
+  overflow auto
+  position relative
+  z-index 1
+}
 .slide-enter-active, .slide-leave-active {
   transition: all 0.3s;
 }
@@ -200,8 +207,43 @@ body {
   opacity: 0;
 }
 
-.drawer-content-wrap {
-  height 100%
-  display flex
+@keyframes bounce-in {
+  from,
+  60%,
+  75%,
+  90%,
+  to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  from {
+    opacity: 0;
+    transform: translate3d(200px, 0, 0);
+  }
+
+  60% {
+    opacity: 1;
+  }
+
+  75% {
+    transform: translate3d(10px, 0, 0);
+  }
+
+  90% {
+    transform: translate3d(-5px, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
 }
+
+.bounce-enter-active {
+  animation: bounce-in .2s;
+}
+
+.bounce-leave-active {
+  animation: bounce-in .2s reverse;
+}
+
 </style>

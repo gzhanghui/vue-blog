@@ -12,6 +12,13 @@ function resolve(dir) {
 }
 
 module.exports = {
+    css: {
+      loaderOptions: {
+        sass: {
+          data: `@import "~@/element-variables.scss";`
+        }
+      }
+    },
     chainWebpack: config => {
         config.resolve.alias
             .set('components', resolve('./src/components'))
